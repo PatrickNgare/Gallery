@@ -1,12 +1,46 @@
-pipeline{
- agent any
-  tools{
-   nodejs "Node-JS"
-}
-stages{
- stage('cloning Gallery Repo'){
-    steps{
- git "https://github.com/PatrickNgare/gallery"
+pipeline {
+    agent any
+    tools {
+        nodejs "Node-Js"
+    }
 
-}
+    stages {
+        stage('Cloning Gallery Repo') {
+            steps {
+                
+                git "https://github.com/PatrickNgare/gallery"
+            }
+        }
 
+        stage('Install Dependencies') {
+            steps {
+               
+                sh 'npm install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                
+                sh 'npm test'
+            }
+        }
+    }
+
+    post {
+        always {
+            
+            slackSend(
+                color: currentBuild.resultIsBetterOrEqualTo('SUCCESS') ? 'good' : 'danger',
+                message: "Pipeline ${currentBuild.result}: ${currentBuild.fullDisplayName}\nResult: ${currentBuild.result}",
+                channel: '#ip'
+            )
+            /
+            emailext(
+                subject: "Pipeline ${currentBuild.result}: ${currentBuild.fullDisplayName}",
+                body: "The Jenkins pipeline has completed. Result: ${currentBuild.result}",
+                to: "patrickngare@gmail.com"
+            )
+        }
+    }
+}
