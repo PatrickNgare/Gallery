@@ -1,1 +1,12 @@
+pipeline{
+ agent any
+  tools{
+   nodejs "Node-JS"
+}
+stages{
+ stage('cloning Gallery Repo'){
+    steps{
+ git "https://github.com/PatrickNgare/gallery"
+
+}
 
